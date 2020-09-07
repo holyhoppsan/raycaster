@@ -1,0 +1,8 @@
+{
+    "name": "pathtracer",
+    "description": "A simple javascript path tracer",
+    "authors": "Daniel Hall",
+    "version": "1.0.0",
+    "main": "src/index.js",
+    "dependencies": {}
+}
