@@ -8,6 +8,9 @@ window.onload = function () {
 
     const imagedata = context.createImageData(width, height);
 
+    let frameCount = 0;
+    let fps, fpsInterval, startTime, then, elapsed;
+
     function createImage() {
         const stride = 4;
 
@@ -23,12 +26,34 @@ window.onload = function () {
         }
     }
 
-    function main(tframe) {
-        window.requestAnimationFrame(main);
-
+    function update(delta) {
         createImage();
 
         context.putImageData(imagedata, 0, 0);
+    }
+
+    function startAnimating(fps) {
+        fpsInterval = 1000 / fps;
+        then = Date.now();
+        startTime = then;
+        console.log(startTime);
+        animate();
+    }
+
+    function animate() {
+        setTimeout(() => {
+            window.requestAnimationFrame(animate);
+            now = Date.now();
+            let sinceStart = now - startTime;
+            let currentFPS = Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
+            const elapsedTime = Math.round((sinceStart / 1000) * 100) / 100;
+            document.getElementById("result").textContent = `Elapsed time = ${elapsedTime} secs, current fps = ${currentFPS}`;
+        }, fpsInterval);
+    }
+
+    function main(tframe) {
+        //window.requestAnimationFrame(update);
+        startAnimating(5);
     }
 
     main(0);
