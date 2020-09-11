@@ -1,3 +1,10 @@
+class Vector2D {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
 // Callback when the window is loaded
 window.onload = function () {
     const canvas = document.getElementById("viewport");
@@ -44,15 +51,19 @@ window.onload = function () {
     }
 
     function render(delta) {
+        renderBackground();
+
+        renderWallSegment(45, 120, 160, 0, 128, 0, 255, renderBuffer);
+
+        context.putImageData(renderBuffer, 0, 0);
+    }
+
+    function renderBackground() {
         // Render the sky
         drawRect(0, 0, screenWidth, screenHeight / 2, 135, 206, 250, 255, renderBuffer);
 
         // Render floor
         drawRect(0, screenHeight / 2, screenWidth, screenHeight, 0, 0, 0, 255, renderBuffer);
-
-        renderWallSegment(45, 120, 160, 0, 128, 0, 255, renderBuffer);
-
-        context.putImageData(renderBuffer, 0, 0);
     }
 
     function init(fps) {
