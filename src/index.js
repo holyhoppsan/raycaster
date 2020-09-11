@@ -53,7 +53,7 @@ window.onload = function () {
     function render(delta) {
         renderBackground();
 
-        renderWallSegment(45, 120, 160, 0, 128, 0, 255, renderBuffer);
+        renderWalls();
 
         context.putImageData(renderBuffer, 0, 0);
     }
@@ -64,6 +64,10 @@ window.onload = function () {
 
         // Render floor
         drawRect(0, screenHeight / 2, screenWidth, screenHeight, 0, 0, 0, 255, renderBuffer);
+    }
+
+    function renderWalls() {
+        renderWallSegment(45, 120, 160, 0, 128, 0, 255, renderBuffer);
     }
 
     function init(fps) {
