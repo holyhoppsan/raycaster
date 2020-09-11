@@ -8,15 +8,19 @@ window.onload = function () {
 
     const imagedata = context.createImageData(width, height);
 
-    let frameCount = 0;
-    let fps, fpsInterval, startTime, then, elapsed;
+    const frameDeltaComparisonEpsilon = 1;
+    const oneSecInMS = 1000;
 
-    function createImage() {
+    let timeSinceLastTick = 0;
+    let previousTimeStampMs = 0;
+    let fpsInterval;
+
+    function updateImageData() {
         const stride = 4;
 
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
-                const pixelIndex = ((y * width) + x) * 4;
+                const pixelIndex = ((y * width) + x) * stride;
 
                 imagedata.data[pixelIndex] = 0;
                 imagedata.data[pixelIndex + 1] = 255
@@ -26,34 +30,46 @@ window.onload = function () {
         }
     }
 
-    function update(delta) {
-        createImage();
+    function render(delta) {
+        updateImageData();
 
         context.putImageData(imagedata, 0, 0);
     }
 
-    function startAnimating(fps) {
-        fpsInterval = 1000 / fps;
-        then = Date.now();
-        startTime = then;
-        console.log(startTime);
-        animate();
+    function init(fps) {
+        fpsInterval = oneSecInMS / fps;
+        previousTimeStampMs = 0;
+        timeSinceLastTick = 0;
     }
 
-    function animate() {
-        setTimeout(() => {
-            window.requestAnimationFrame(animate);
-            now = Date.now();
-            let sinceStart = now - startTime;
-            let currentFPS = Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
-            const elapsedTime = Math.round((sinceStart / 1000) * 100) / 100;
-            document.getElementById("result").textContent = `Elapsed time = ${elapsedTime} secs, current fps = ${currentFPS}`;
-        }, fpsInterval);
+    function update(timeStamp) {
+        const targetFrameRate = document.getElementById("framelimiter").value;
+        fpsInterval = oneSecInMS / targetFrameRate;
+        const frameRateIsUnbound = targetFrameRate == 0;
+
+        let elapsedTimeMs = timeStamp - previousTimeStampMs;
+        previousTimeStampMs = timeStamp;
+
+        timeSinceLastTick += elapsedTimeMs;
+
+        if (frameRateIsUnbound || Math.abs(timeSinceLastTick - fpsInterval) < frameDeltaComparisonEpsilon || timeSinceLastTick > fpsInterval) {
+
+            //do rendering here.
+            render(timeSinceLastTick);
+
+            const currentFPS = oneSecInMS / timeSinceLastTick;
+
+            document.getElementById("result").textContent = `Current fps = ${currentFPS}, current frame time = ${timeSinceLastTick} ms`;
+
+            timeSinceLastTick = 0;
+        }
+
+        window.requestAnimationFrame(update);
     }
 
     function main(tframe) {
-        //window.requestAnimationFrame(update);
-        startAnimating(5);
+        init(30);
+        update(0);
     }
 
     main(0);
