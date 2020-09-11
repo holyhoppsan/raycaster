@@ -3,10 +3,10 @@ window.onload = function () {
     const canvas = document.getElementById("viewport");
     const context = canvas.getContext("2d");
 
-    const width = canvas.width;
-    const height = canvas.height;
+    const screenWidth = canvas.width;
+    const screenHeight = canvas.height;
 
-    const imagedata = context.createImageData(width, height);
+    const renderBuffer = context.createImageData(screenWidth, screenHeight);
 
     const frameDeltaComparisonEpsilon = 1;
     const oneSecInMS = 1000;
@@ -15,25 +15,44 @@ window.onload = function () {
     let previousTimeStampMs = 0;
     let fpsInterval;
 
-    function updateImageData() {
+    function drawRect(xStart, yStart, xEnd, yEnd, r, g, b, a, imagedata) {
         const stride = 4;
 
-        for (let x = 0; x < width; x++) {
-            for (let y = 0; y < height; y++) {
-                const pixelIndex = ((y * width) + x) * stride;
+        for (let x = xStart; x < xEnd; x++) {
+            for (let y = yStart; y < yEnd; y++) {
+                const pixelIndex = ((y * screenWidth) + x) * stride;
 
-                imagedata.data[pixelIndex] = 0;
-                imagedata.data[pixelIndex + 1] = 255
-                imagedata.data[pixelIndex + 2] = 0;
-                imagedata.data[pixelIndex + 3] = 255
+                imagedata.data[pixelIndex] = r;
+                imagedata.data[pixelIndex + 1] = g;
+                imagedata.data[pixelIndex + 2] = b;
+                imagedata.data[pixelIndex + 3] = a;
             }
         }
     }
 
-    function render(delta) {
-        updateImageData();
+    function renderWallSegment(xPos, yStart, yEnd, r, g, b, a, imagedata) {
+        const stride = 4;
 
-        context.putImageData(imagedata, 0, 0);
+        for (let y = yStart; y < yEnd; y++) {
+            const pixelIndex = ((y * screenWidth) + xPos) * stride;
+
+            imagedata.data[pixelIndex] = r;
+            imagedata.data[pixelIndex + 1] = g;
+            imagedata.data[pixelIndex + 2] = b;
+            imagedata.data[pixelIndex + 3] = a;
+        }
+    }
+
+    function render(delta) {
+        // Render the sky
+        drawRect(0, 0, screenWidth, screenHeight / 2, 135, 206, 250, 255, renderBuffer);
+
+        // Render floor
+        drawRect(0, screenHeight / 2, screenWidth, screenHeight, 0, 0, 0, 255, renderBuffer);
+
+        renderWallSegment(45, 120, 160, 0, 128, 0, 255, renderBuffer);
+
+        context.putImageData(renderBuffer, 0, 0);
     }
 
     function init(fps) {
