@@ -49,6 +49,11 @@ class Application {
         this.previousTimeStampMs = 0;
         this.fpsInterval;
         this.renderBuffer = new RenderBuffer(document.getElementById("viewport"));
+
+        //Temporary game logic variables
+        this.playerPosition = new Vector2D(100.0, 100.0);
+        this.playerDirection = new Vector2D(-1.0, 0.0);
+        this.viewPlane = new Vector2D(0.0, 0.66);
     }
 
     init = (fps) => {
@@ -70,6 +75,7 @@ class Application {
         if (frameRateIsUnbound || Math.abs(this.timeSinceLastTick - this.fpsInterval) < this.frameDeltaComparisonEpsilon || this.timeSinceLastTick > this.fpsInterval) {
 
             // Update game logic
+            this.renderPlayer();
 
             // Do rendering here.
             this.render(this.timeSinceLastTick);
@@ -84,10 +90,30 @@ class Application {
         window.requestAnimationFrame(this.update);
     }
 
+    renderPlayer = () => {
+        const playerColor = new Color(255, 0, 0, 255);
+
+        const extensionFactor = 20;
+        const extendedVector = new Vector2D(this.playerPosition.x + (this.playerDirection.x * extensionFactor), this.playerPosition.y + (this.playerDirection.y * extensionFactor));
+        drawLineDDA(this.playerPosition, extendedVector, playerColor, this.renderBuffer);
+
+        const leftCameraPosition = new Vector2D(this.playerPosition.x + ((this.playerDirection.x + this.viewPlane.x) * extensionFactor), this.playerPosition.y + ((this.playerDirection.y + this.viewPlane.y) * extensionFactor));
+        drawLineDDA(this.playerPosition, leftCameraPosition, playerColor, this.renderBuffer);
+
+        const rightCameraPosition = new Vector2D(this.playerPosition.x + ((this.playerDirection.x - this.viewPlane.x) * extensionFactor), this.playerPosition.y + ((this.playerDirection.y - this.viewPlane.y) * extensionFactor));
+        drawLineDDA(this.playerPosition, rightCameraPosition, playerColor, this.renderBuffer);
+
+        drawLineDDA(rightCameraPosition, leftCameraPosition, playerColor, this.renderBuffer);
+
+        this.renderBuffer.plotPixel(this.playerPosition.x, this.playerPosition.y, playerColor);
+    }
+
     render = (delta) => {
         this.renderBackground();
 
         this.renderWalls();
+
+        this.renderPlayer();
 
         this.renderBuffer.applyImageData();
     }
