@@ -12,8 +12,18 @@ class RenderBuffer {
         this.context = canvas.getContext("2d");
         this.width = canvas.width;
         this.height = canvas.height;
+        this.stride = 4;
 
         this.imagedata = this.context.createImageData(canvas.width, canvas.height);
+    }
+
+    plotPixel(x, y, r, g, b, a) {
+        const pixelIndex = ((y * this.imagedata.width) + x) * this.stride;
+
+        this.imagedata.data[pixelIndex] = r;
+        this.imagedata.data[pixelIndex + 1] = g;
+        this.imagedata.data[pixelIndex + 2] = b;
+        this.imagedata.data[pixelIndex + 3] = a;
     }
 
 
@@ -80,37 +90,53 @@ class Application {
     }
 
     renderWalls = () => {
-        renderWallSegment(45, 120, 160, 0, 128, 0, 255, this.renderBuffer);
+        renderWallSegment(45, 120, 160, 255, 0, 0, 255, this.renderBuffer);
+
+        drawLineDDA(40, 160, 50, 120, 0, 0, 255, 255, this.renderBuffer);
     }
 
 }
 
 // Rendering functions
 function drawRect(xStart, yStart, xEnd, yEnd, r, g, b, a, renderBuffer) {
-    const stride = 4;
-
-    for (let x = xStart; x < xEnd; x++) {
-        for (let y = yStart; y < yEnd; y++) {
-            const pixelIndex = ((y * renderBuffer.width) + x) * stride;
-
-            renderBuffer.imagedata.data[pixelIndex] = r;
-            renderBuffer.imagedata.data[pixelIndex + 1] = g;
-            renderBuffer.imagedata.data[pixelIndex + 2] = b;
-            renderBuffer.imagedata.data[pixelIndex + 3] = a;
+    for (let x = xStart; x <= xEnd; x++) {
+        for (let y = yStart; y <= yEnd; y++) {
+            renderBuffer.plotPixel(x, y, r, g, b, a);
         }
     }
 }
 
+function drawLineDDA(xStart, yStart, xEnd, yEnd, r, g, b, a, renderBuffer) {
+    const dx = xEnd - xStart;
+    const dy = yEnd - yStart;
+
+    let steps;
+    if (Math.abs(dx) > Math.abs(dy)) {
+        steps = Math.abs(dx);
+    } else {
+        steps = Math.abs(dy);
+    }
+
+    const xIncrement = dx / steps;
+    const yIncrement = dy / steps;
+
+    let x = xStart;
+    let y = yStart;
+
+    //plot initial pixel
+    renderBuffer.plotPixel(x, y, r, g, b, a);
+
+    for (let stepIndex = 0; stepIndex < steps; stepIndex++) {
+        x += xIncrement;
+        y += yIncrement;
+
+        renderBuffer.plotPixel(Math.round(x), Math.round(y), r, g, b, a);
+    }
+}
+
 function renderWallSegment(xPos, yStart, yEnd, r, g, b, a, renderBuffer) {
-    const stride = 4;
-
-    for (let y = yStart; y < yEnd; y++) {
-        const pixelIndex = ((y * renderBuffer.width) + xPos) * stride;
-
-        renderBuffer.imagedata.data[pixelIndex] = r;
-        renderBuffer.imagedata.data[pixelIndex + 1] = g;
-        renderBuffer.imagedata.data[pixelIndex + 2] = b;
-        renderBuffer.imagedata.data[pixelIndex + 3] = a;
+    for (let y = yStart; y <= yEnd; y++) {
+        renderBuffer.plotPixel(xPos, y, r, g, b, a);
     }
 }
 
