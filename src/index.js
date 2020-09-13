@@ -1,3 +1,4 @@
+// Class definitions
 class Vector2D {
     constructor(x, y) {
         this.x = x;
@@ -21,38 +22,76 @@ class RenderBuffer {
     }
 }
 
-// Callback when the window is loaded
-window.onload = function () {
-
-    const renderBuffer = new RenderBuffer(document.getElementById("viewport"));
-
-    const frameDeltaComparisonEpsilon = 1;
-    const oneSecInMS = 1000;
-
-    let timeSinceLastTick = 0;
-    let previousTimeStampMs = 0;
-    let fpsInterval;
-
-    function drawRect(xStart, yStart, xEnd, yEnd, r, g, b, a, renderBuffer) {
-        const stride = 4;
-
-        for (let x = xStart; x < xEnd; x++) {
-            for (let y = yStart; y < yEnd; y++) {
-                const pixelIndex = ((y * renderBuffer.width) + x) * stride;
-
-                renderBuffer.imagedata.data[pixelIndex] = r;
-                renderBuffer.imagedata.data[pixelIndex + 1] = g;
-                renderBuffer.imagedata.data[pixelIndex + 2] = b;
-                renderBuffer.imagedata.data[pixelIndex + 3] = a;
-            }
-        }
+class Application {
+    constructor() {
+        this.frameDeltaComparisonEpsilon = 1;
+        this.oneSecInMS = 1000;
+        this.timeSinceLastTick = 0;
+        this.previousTimeStampMs = 0;
+        this.fpsInterval;
+        this.renderBuffer = new RenderBuffer(document.getElementById("viewport"));
     }
 
-    function renderWallSegment(xPos, yStart, yEnd, r, g, b, a, renderBuffer) {
-        const stride = 4;
+    init = (fps) => {
+        this.fpsInterval = this.oneSecInMS / fps;
+        this.previousTimeStampMs = 0;
+        this.timeSinceLastTick = 0;
+    }
 
+    update = (timeStamp) => {
+        const targetFrameRate = document.getElementById("framelimiter").value;
+        this.fpsInterval = this.oneSecInMS / targetFrameRate;
+        const frameRateIsUnbound = targetFrameRate == 0;
+
+        let elapsedTimeMs = timeStamp - this.previousTimeStampMs;
+        this.previousTimeStampMs = timeStamp;
+
+        this.timeSinceLastTick += elapsedTimeMs;
+
+        if (frameRateIsUnbound || Math.abs(this.timeSinceLastTick - this.fpsInterval) < this.frameDeltaComparisonEpsilon || this.timeSinceLastTick > this.fpsInterval) {
+
+            //do rendering here.
+            this.render(this.timeSinceLastTick);
+
+            const currentFPS = this.oneSecInMS / this.timeSinceLastTick;
+
+            document.getElementById("result").textContent = `Current fps = ${currentFPS}, current frame time = ${this.timeSinceLastTick} ms`;
+
+            this.timeSinceLastTick = 0;
+        }
+
+        window.requestAnimationFrame(this.update);
+    }
+
+    render = (delta) => {
+        this.renderBackground();
+
+        this.renderWalls();
+
+        this.renderBuffer.applyImageData();
+    }
+
+    renderBackground = () => {
+        // Render the sky
+        drawRect(0, 0, this.renderBuffer.width, this.renderBuffer.height / 2, 135, 206, 250, 255, this.renderBuffer);
+
+        // Render floor
+        drawRect(0, this.renderBuffer.height / 2, this.renderBuffer.width, this.renderBuffer.height, 0, 0, 0, 255, this.renderBuffer);
+    }
+
+    renderWalls = () => {
+        renderWallSegment(45, 120, 160, 0, 128, 0, 255, this.renderBuffer);
+    }
+
+}
+
+// Rendering functions
+function drawRect(xStart, yStart, xEnd, yEnd, r, g, b, a, renderBuffer) {
+    const stride = 4;
+
+    for (let x = xStart; x < xEnd; x++) {
         for (let y = yStart; y < yEnd; y++) {
-            const pixelIndex = ((y * renderBuffer.width) + xPos) * stride;
+            const pixelIndex = ((y * renderBuffer.width) + x) * stride;
 
             renderBuffer.imagedata.data[pixelIndex] = r;
             renderBuffer.imagedata.data[pixelIndex + 1] = g;
@@ -60,61 +99,28 @@ window.onload = function () {
             renderBuffer.imagedata.data[pixelIndex + 3] = a;
         }
     }
+}
 
-    function render(delta) {
-        renderBackground();
+function renderWallSegment(xPos, yStart, yEnd, r, g, b, a, renderBuffer) {
+    const stride = 4;
 
-        renderWalls();
+    for (let y = yStart; y < yEnd; y++) {
+        const pixelIndex = ((y * renderBuffer.width) + xPos) * stride;
 
-        renderBuffer.applyImageData();
+        renderBuffer.imagedata.data[pixelIndex] = r;
+        renderBuffer.imagedata.data[pixelIndex + 1] = g;
+        renderBuffer.imagedata.data[pixelIndex + 2] = b;
+        renderBuffer.imagedata.data[pixelIndex + 3] = a;
     }
+}
 
-    function renderBackground() {
-        // Render the sky
-        drawRect(0, 0, renderBuffer.width, renderBuffer.height / 2, 135, 206, 250, 255, renderBuffer);
-
-        // Render floor
-        drawRect(0, renderBuffer.height / 2, renderBuffer.width, renderBuffer.height, 0, 0, 0, 255, renderBuffer);
-    }
-
-    function renderWalls() {
-        renderWallSegment(45, 120, 160, 0, 128, 0, 255, renderBuffer);
-    }
-
-    function init(fps) {
-        fpsInterval = oneSecInMS / fps;
-        previousTimeStampMs = 0;
-        timeSinceLastTick = 0;
-    }
-
-    function update(timeStamp) {
-        const targetFrameRate = document.getElementById("framelimiter").value;
-        fpsInterval = oneSecInMS / targetFrameRate;
-        const frameRateIsUnbound = targetFrameRate == 0;
-
-        let elapsedTimeMs = timeStamp - previousTimeStampMs;
-        previousTimeStampMs = timeStamp;
-
-        timeSinceLastTick += elapsedTimeMs;
-
-        if (frameRateIsUnbound || Math.abs(timeSinceLastTick - fpsInterval) < frameDeltaComparisonEpsilon || timeSinceLastTick > fpsInterval) {
-
-            //do rendering here.
-            render(timeSinceLastTick);
-
-            const currentFPS = oneSecInMS / timeSinceLastTick;
-
-            document.getElementById("result").textContent = `Current fps = ${currentFPS}, current frame time = ${timeSinceLastTick} ms`;
-
-            timeSinceLastTick = 0;
-        }
-
-        window.requestAnimationFrame(update);
-    }
+// Callback when the window is loaded
+window.onload = function () {
 
     function main(tframe) {
-        init(30);
-        update(0);
+        let app = new Application();
+        app.init(30);
+        app.update(0);
     }
 
     main(0);
