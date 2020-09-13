@@ -6,6 +6,15 @@ class Vector2D {
     }
 }
 
+class Color {
+    constructor(r, g, b, a) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+    }
+}
+
 class RenderBuffer {
     constructor(canvas) {
         this.canvas = canvas;
@@ -17,13 +26,13 @@ class RenderBuffer {
         this.imagedata = this.context.createImageData(canvas.width, canvas.height);
     }
 
-    plotPixel(x, y, r, g, b, a) {
+    plotPixel(x, y, color) {
         const pixelIndex = ((y * this.imagedata.width) + x) * this.stride;
 
-        this.imagedata.data[pixelIndex] = r;
-        this.imagedata.data[pixelIndex + 1] = g;
-        this.imagedata.data[pixelIndex + 2] = b;
-        this.imagedata.data[pixelIndex + 3] = a;
+        this.imagedata.data[pixelIndex] = color.r;
+        this.imagedata.data[pixelIndex + 1] = color.g;
+        this.imagedata.data[pixelIndex + 2] = color.b;
+        this.imagedata.data[pixelIndex + 3] = color.a;
     }
 
 
@@ -60,7 +69,9 @@ class Application {
 
         if (frameRateIsUnbound || Math.abs(this.timeSinceLastTick - this.fpsInterval) < this.frameDeltaComparisonEpsilon || this.timeSinceLastTick > this.fpsInterval) {
 
-            //do rendering here.
+            // Update game logic
+
+            // Do rendering here.
             this.render(this.timeSinceLastTick);
 
             const currentFPS = this.oneSecInMS / this.timeSinceLastTick;
@@ -83,32 +94,42 @@ class Application {
 
     renderBackground = () => {
         // Render the sky
-        drawRect(0, 0, this.renderBuffer.width, this.renderBuffer.height / 2, 135, 206, 250, 255, this.renderBuffer);
+        const skyStartCoord = new Vector2D(0, 0);
+        const skyEndCoord = new Vector2D(this.renderBuffer.width, this.renderBuffer.height / 2);
+        const skyColor = new Color(135, 206, 250, 255);
+        drawRect(skyStartCoord, skyEndCoord, skyColor, this.renderBuffer);
 
         // Render floor
-        drawRect(0, this.renderBuffer.height / 2, this.renderBuffer.width, this.renderBuffer.height, 0, 0, 0, 255, this.renderBuffer);
+        const floorStartCoord = new Vector2D(0, this.renderBuffer.height / 2);
+        const floorEndCoord = new Vector2D(this.renderBuffer.width, this.renderBuffer.height);
+        const floorColor = new Color(0, 0, 0, 255);
+        drawRect(floorStartCoord, floorEndCoord, floorColor, this.renderBuffer);
     }
 
     renderWalls = () => {
-        renderWallSegment(45, 120, 160, 255, 0, 0, 255, this.renderBuffer);
+        const wallColor = new Color(255, 0, 0, 255);
+        renderWallSegment(45, 120, 160, wallColor, this.renderBuffer);
 
-        drawLineDDA(40, 160, 50, 120, 0, 0, 255, 255, this.renderBuffer);
+        const lineStartCoord = new Vector2D(40, 160);
+        const lineEndCoord = new Vector2D(50, 120);
+        const lineColor = new Color(0, 0, 255, 255);
+        drawLineDDA(lineStartCoord, lineEndCoord, lineColor, this.renderBuffer);
     }
 
 }
 
 // Rendering functions
-function drawRect(xStart, yStart, xEnd, yEnd, r, g, b, a, renderBuffer) {
-    for (let x = xStart; x <= xEnd; x++) {
-        for (let y = yStart; y <= yEnd; y++) {
-            renderBuffer.plotPixel(x, y, r, g, b, a);
+function drawRect(startPos, endPos, color, renderBuffer) {
+    for (let x = startPos.x; x <= endPos.x; x++) {
+        for (let y = startPos.y; y <= endPos.y; y++) {
+            renderBuffer.plotPixel(x, y, color);
         }
     }
 }
 
-function drawLineDDA(xStart, yStart, xEnd, yEnd, r, g, b, a, renderBuffer) {
-    const dx = xEnd - xStart;
-    const dy = yEnd - yStart;
+function drawLineDDA(startPos, endPos, color, renderBuffer) {
+    const dx = endPos.x - startPos.x;
+    const dy = endPos.y - startPos.y;
 
     let steps;
     if (Math.abs(dx) > Math.abs(dy)) {
@@ -120,24 +141,22 @@ function drawLineDDA(xStart, yStart, xEnd, yEnd, r, g, b, a, renderBuffer) {
     const xIncrement = dx / steps;
     const yIncrement = dy / steps;
 
-    let x = xStart;
-    let y = yStart;
+    let x = startPos.x;
+    let y = startPos.y;
 
     //plot initial pixel
-    renderBuffer.plotPixel(x, y, r, g, b, a);
+    renderBuffer.plotPixel(x, y, color);
 
     for (let stepIndex = 0; stepIndex < steps; stepIndex++) {
         x += xIncrement;
         y += yIncrement;
 
-        renderBuffer.plotPixel(Math.round(x), Math.round(y), r, g, b, a);
+        renderBuffer.plotPixel(Math.round(x), Math.round(y), color);
     }
 }
 
-function renderWallSegment(xPos, yStart, yEnd, r, g, b, a, renderBuffer) {
-    for (let y = yStart; y <= yEnd; y++) {
-        renderBuffer.plotPixel(xPos, y, r, g, b, a);
-    }
+function renderWallSegment(xPos, yStart, yEnd, color, renderBuffer) {
+    drawLineDDA(new Vector2D(xPos, yStart), new Vector2D(xPos, yEnd), color, renderBuffer);
 }
 
 // Callback when the window is loaded
