@@ -5,15 +5,26 @@ class Vector2D {
     }
 }
 
+class RenderBuffer {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.context = canvas.getContext("2d");
+        this.width = canvas.width;
+        this.height = canvas.height;
+
+        this.imagedata = this.context.createImageData(canvas.width, canvas.height);
+    }
+
+
+    applyImageData = () => {
+        this.context.putImageData(this.imagedata, 0, 0);
+    }
+}
+
 // Callback when the window is loaded
 window.onload = function () {
-    const canvas = document.getElementById("viewport");
-    const context = canvas.getContext("2d");
 
-    const screenWidth = canvas.width;
-    const screenHeight = canvas.height;
-
-    const renderBuffer = context.createImageData(screenWidth, screenHeight);
+    const renderBuffer = new RenderBuffer(document.getElementById("viewport"));
 
     const frameDeltaComparisonEpsilon = 1;
     const oneSecInMS = 1000;
@@ -22,31 +33,31 @@ window.onload = function () {
     let previousTimeStampMs = 0;
     let fpsInterval;
 
-    function drawRect(xStart, yStart, xEnd, yEnd, r, g, b, a, imagedata) {
+    function drawRect(xStart, yStart, xEnd, yEnd, r, g, b, a, renderBuffer) {
         const stride = 4;
 
         for (let x = xStart; x < xEnd; x++) {
             for (let y = yStart; y < yEnd; y++) {
-                const pixelIndex = ((y * screenWidth) + x) * stride;
+                const pixelIndex = ((y * renderBuffer.width) + x) * stride;
 
-                imagedata.data[pixelIndex] = r;
-                imagedata.data[pixelIndex + 1] = g;
-                imagedata.data[pixelIndex + 2] = b;
-                imagedata.data[pixelIndex + 3] = a;
+                renderBuffer.imagedata.data[pixelIndex] = r;
+                renderBuffer.imagedata.data[pixelIndex + 1] = g;
+                renderBuffer.imagedata.data[pixelIndex + 2] = b;
+                renderBuffer.imagedata.data[pixelIndex + 3] = a;
             }
         }
     }
 
-    function renderWallSegment(xPos, yStart, yEnd, r, g, b, a, imagedata) {
+    function renderWallSegment(xPos, yStart, yEnd, r, g, b, a, renderBuffer) {
         const stride = 4;
 
         for (let y = yStart; y < yEnd; y++) {
-            const pixelIndex = ((y * screenWidth) + xPos) * stride;
+            const pixelIndex = ((y * renderBuffer.width) + xPos) * stride;
 
-            imagedata.data[pixelIndex] = r;
-            imagedata.data[pixelIndex + 1] = g;
-            imagedata.data[pixelIndex + 2] = b;
-            imagedata.data[pixelIndex + 3] = a;
+            renderBuffer.imagedata.data[pixelIndex] = r;
+            renderBuffer.imagedata.data[pixelIndex + 1] = g;
+            renderBuffer.imagedata.data[pixelIndex + 2] = b;
+            renderBuffer.imagedata.data[pixelIndex + 3] = a;
         }
     }
 
@@ -55,15 +66,15 @@ window.onload = function () {
 
         renderWalls();
 
-        context.putImageData(renderBuffer, 0, 0);
+        renderBuffer.applyImageData();
     }
 
     function renderBackground() {
         // Render the sky
-        drawRect(0, 0, screenWidth, screenHeight / 2, 135, 206, 250, 255, renderBuffer);
+        drawRect(0, 0, renderBuffer.width, renderBuffer.height / 2, 135, 206, 250, 255, renderBuffer);
 
         // Render floor
-        drawRect(0, screenHeight / 2, screenWidth, screenHeight, 0, 0, 0, 255, renderBuffer);
+        drawRect(0, renderBuffer.height / 2, renderBuffer.width, renderBuffer.height, 0, 0, 0, 255, renderBuffer);
     }
 
     function renderWalls() {
