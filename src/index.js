@@ -4,6 +4,70 @@ class Vector2D {
         this.x = x;
         this.y = y;
     }
+
+    get x() {
+        return this._x;
+    }
+
+    set x(value) {
+        this._x = value;
+    }
+
+    get y() {
+        return this._y;
+    }
+
+    set y(value) {
+        this._y = value;
+    }
+
+    add(value) {
+        const newVector = new Vector2D(this.x, this.y);
+        newVector.x += value.x;
+        newVector.y += value.y;
+        return newVector;
+    }
+
+    addEqual(value) {
+        this.x += value.x;
+        this.y += value.y;
+    }
+
+    sub(value) {
+        const newVector = new Vector2D(this.x, this.y);
+        newVector.x -= value.x;
+        newVector.y -= value.y;
+        return newVector;
+    }
+
+    subEqual(value) {
+        this.x -= value.x;
+        this.y -= value.y;
+    }
+
+    mul(value) {
+        const newVector = new Vector2D(this.x, this.y);
+        newVector.x *= value.x;
+        newVector.y *= value.y;
+        return newVector;
+    }
+
+    mulScalar(scalar) {
+        const newVector = new Vector2D(this.x, this.y);
+        newVector.x *= scalar;
+        newVector.y *= scalar;
+        return newVector;
+    }
+
+    mulEqual(value) {
+        this.x *= value.x;
+        this.y *= value.y;
+    }
+
+    mulScalarEqual(scalar) {
+        this.x *= scalar;
+        this.y *= scalar;
+    }
 }
 
 class Color {
@@ -94,13 +158,13 @@ class Application {
         const playerColor = new Color(255, 0, 0, 255);
 
         const extensionFactor = 20;
-        const extendedVector = new Vector2D(this.playerPosition.x + (this.playerDirection.x * extensionFactor), this.playerPosition.y + (this.playerDirection.y * extensionFactor));
+        const extendedVector = this.playerPosition.add(this.playerDirection.mulScalar(extensionFactor));
         drawLineDDA(this.playerPosition, extendedVector, playerColor, this.renderBuffer);
 
-        const leftCameraPosition = new Vector2D(this.playerPosition.x + ((this.playerDirection.x + this.viewPlane.x) * extensionFactor), this.playerPosition.y + ((this.playerDirection.y + this.viewPlane.y) * extensionFactor));
+        const leftCameraPosition = this.playerPosition.add(this.playerDirection.add(this.viewPlane).mulScalar(extensionFactor));
         drawLineDDA(this.playerPosition, leftCameraPosition, playerColor, this.renderBuffer);
 
-        const rightCameraPosition = new Vector2D(this.playerPosition.x + ((this.playerDirection.x - this.viewPlane.x) * extensionFactor), this.playerPosition.y + ((this.playerDirection.y - this.viewPlane.y) * extensionFactor));
+        const rightCameraPosition = this.playerPosition.add(this.playerDirection.sub(this.viewPlane).mulScalar(extensionFactor));
         drawLineDDA(this.playerPosition, rightCameraPosition, playerColor, this.renderBuffer);
 
         drawLineDDA(rightCameraPosition, leftCameraPosition, playerColor, this.renderBuffer);
