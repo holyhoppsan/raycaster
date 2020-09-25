@@ -11,9 +11,10 @@ import {
 } from './color.js';
 
 class Level {
-    constructor(gridSize) {
-        this._grid = new Array(gridSize.x * gridSize.y).fill(0);
-        this._gridSize = gridSize;
+    constructor(gridSize, player) {
+        this.grid = new Array(gridSize.x * gridSize.y).fill(0);
+        this.gridSize = gridSize;
+        this.player = player;
     }
 
     get gridSize() {
@@ -22,6 +23,14 @@ class Level {
 
     set gridSize(value) {
         this._gridSize = value;
+    }
+
+    get player() {
+        return this._player;
+    }
+
+    set player(value) {
+        this._player = value;
     }
 
     render = (renderBuffer) => {
@@ -40,6 +49,27 @@ class Level {
                 drawLineDDA(new Vector2D(0, yPosition), new Vector2D(renderBuffer.width, yPosition), new Color(0, 255, 0, 255), renderBuffer);
             }
         }
+
+        this.renderPlayer(this.player.position, renderBuffer);
+    }
+
+    renderPlayer = (screenPosition, renderTarget) => {
+        const playerColor = new Color(255, 0, 0, 255);
+        const viewPlaneColor = new Color(0, 255, 0, 255);
+
+        const extensionFactor = 20;
+        const extendedVector = screenPosition.add(this.player.direction.mulScalar(extensionFactor));
+        drawLineDDA(screenPosition, extendedVector, playerColor, renderTarget);
+
+        const leftCameraPosition = screenPosition.add(this.player.direction.add(this.player.viewPlane).mulScalar(extensionFactor));
+        drawLineDDA(screenPosition, leftCameraPosition, playerColor, renderTarget);
+
+        const rightCameraPosition = screenPosition.add(this.player.direction.sub(this.player.viewPlane).mulScalar(extensionFactor));
+        drawLineDDA(screenPosition, rightCameraPosition, playerColor, renderTarget);
+
+        drawLineDDA(rightCameraPosition, leftCameraPosition, viewPlaneColor, renderTarget);
+
+        renderTarget.plotPixel(screenPosition.x, screenPosition.y, playerColor);
     }
 }
 

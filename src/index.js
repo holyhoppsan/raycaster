@@ -69,25 +69,6 @@ class Player {
     set rotationSpeed(value) {
         this._rotationSpeed = value;
     }
-
-    render = (renderTarget) => {
-        const playerColor = new Color(255, 0, 0, 255);
-        const viewPlaneColor = new Color(0, 255, 0, 255);
-
-        const extensionFactor = 20;
-        const extendedVector = this.position.add(this.direction.mulScalar(extensionFactor));
-        drawLineDDA(this.position, extendedVector, playerColor, renderTarget);
-
-        const leftCameraPosition = this.position.add(this.direction.add(this.viewPlane).mulScalar(extensionFactor));
-        drawLineDDA(this.position, leftCameraPosition, playerColor, renderTarget);
-
-        const rightCameraPosition = this.position.add(this.direction.sub(this.viewPlane).mulScalar(extensionFactor));
-        drawLineDDA(this.position, rightCameraPosition, playerColor, renderTarget);
-
-        drawLineDDA(rightCameraPosition, leftCameraPosition, viewPlaneColor, renderTarget);
-
-        renderTarget.plotPixel(this.position.x, this.position.y, playerColor);
-    }
 }
 
 class PlayerController {
@@ -148,7 +129,7 @@ class Application {
         this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(-1.0, 0.0), 45, 50.0, 1.0);
         this.playerController = new PlayerController(this.player);
 
-        this.level = new Level(new Vector2D(20, 20));
+        this.level = new Level(new Vector2D(20, 20), this.player);
     }
 
     init = (fps) => {
@@ -205,8 +186,6 @@ class Application {
         this.renderBuffer.clear(new Color(0, 0, 0, 255));
 
         this.level.render(this.renderBuffer);
-
-        this.player.render(this.renderBuffer);
 
         this.renderBuffer.applyImageData();
     }
