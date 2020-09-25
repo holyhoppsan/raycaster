@@ -37,9 +37,10 @@ class RenderBuffer {
 }
 
 class Player {
-    constructor(spawnPosition, spawnDirection) {
+    constructor(spawnPosition, spawnDirection, viewPlane) {
         this.position = spawnPosition;
         this.direction = spawnDirection;
+        this.viewPlane = viewPlane;
     }
 
     get position() {
@@ -57,6 +58,77 @@ class Player {
     set direction(value) {
         this._direction = value;
     }
+
+    get viewPlane() {
+        return this._viewPlane;
+    }
+
+    set viewPlane(value) {
+        this._viewPlane = value;
+    }
+
+    render = (renderTarget) => {
+        const playerColor = new Color(255, 0, 0, 255);
+        const viewPlaneColor = new Color(0, 255, 0, 255);
+
+        const extensionFactor = 20;
+        const extendedVector = this.position.add(this.direction.mulScalar(extensionFactor));
+        drawLineDDA(this.position, extendedVector, playerColor, renderTarget);
+
+        const leftCameraPosition = this.position.add(this.direction.add(this.viewPlane).mulScalar(extensionFactor));
+        drawLineDDA(this.position, leftCameraPosition, playerColor, renderTarget);
+
+        const rightCameraPosition = this.position.add(this.direction.sub(this.viewPlane).mulScalar(extensionFactor));
+        drawLineDDA(this.position, rightCameraPosition, playerColor, renderTarget);
+
+        drawLineDDA(rightCameraPosition, leftCameraPosition, viewPlaneColor, renderTarget);
+
+        renderTarget.plotPixel(this.position.x, this.position.y, playerColor);
+    }
+}
+
+class PlayerController {
+    constructor(player) {
+        this.player = player;
+    }
+
+    get player() {
+        return this._player;
+    }
+
+    set player(value) {
+        this._player = value;
+    }
+
+    onKey = (event, keyCode, pressed) => {
+        if (pressed) {
+            switch (keyCode) {
+                case keyCodes.UP_ARROW: {
+                    this.player.position.addEqual(this.player.direction);
+                    event.preventDefault();
+                    break;
+                }
+
+                case keyCodes.DOWN_ARROW: {
+                    this.player.position.addEqual(this.player.direction.mulScalar(-1.0));
+                    event.preventDefault();
+                    break;
+                }
+
+                case keyCodes.LEFT_ARROW: {
+                    this.player.position.addEqual(this.player.direction);
+                    event.preventDefault();
+                    break;
+                }
+
+                case keyCodes.RIGHT_ARROW: {
+                    this.player.position.addEqual(this.player.direction.mulScalar(-1.0));
+                    event.preventDefault();
+                    break;
+                }
+            }
+        }
+    }
 }
 
 class Application {
@@ -69,14 +141,25 @@ class Application {
         this.renderBuffer = new RenderBuffer(document.getElementById("viewport"));
 
         //Temporary game logic variables
-        this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(-1.0, 0.0));
-        this.viewPlane = new Vector2D(0.0, 0.66);
+        this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(-1.0, 0.0), new Vector2D(0.0, 0.66));
+        this.playerController = new PlayerController(this.player);
     }
 
     init = (fps) => {
         this.fpsInterval = this.oneSecInMS / fps;
         this.previousTimeStampMs = 0;
         this.timeSinceLastTick = 0;
+
+        // Register input events
+        let boundOnKeyDown = (event) => {
+            this.playerController.onKey(event, event.keyCode, true);
+        };
+        window.addEventListener('keydown', boundOnKeyDown, false);
+
+        let boundOnKeyUp = (event) => {
+            this.playerController.onKey(event, event.keyCode, false);
+        };
+        window.addEventListener('keydown', boundOnKeyUp, false);
     }
 
     update = (timeStamp) => {
@@ -92,7 +175,6 @@ class Application {
         if (frameRateIsUnbound || Math.abs(this.timeSinceLastTick - this.fpsInterval) < this.frameDeltaComparisonEpsilon || this.timeSinceLastTick > this.fpsInterval) {
 
             // Update game logic
-            this.renderPlayer();
 
             // Do rendering here.
             this.render(this.timeSinceLastTick);
@@ -107,31 +189,12 @@ class Application {
         window.requestAnimationFrame(this.update);
     }
 
-    renderPlayer = () => {
-        const playerColor = new Color(255, 0, 0, 255);
-        const viewPlaneColor = new Color(0, 255, 0, 255);
-
-        const extensionFactor = 20;
-        const extendedVector = this.player.position.add(this.player.direction.mulScalar(extensionFactor));
-        drawLineDDA(this.player.position, extendedVector, playerColor, this.renderBuffer);
-
-        const leftCameraPosition = this.player.position.add(this.player.direction.add(this.viewPlane).mulScalar(extensionFactor));
-        drawLineDDA(this.player.position, leftCameraPosition, playerColor, this.renderBuffer);
-
-        const rightCameraPosition = this.player.position.add(this.player.direction.sub(this.viewPlane).mulScalar(extensionFactor));
-        drawLineDDA(this.player.position, rightCameraPosition, playerColor, this.renderBuffer);
-
-        drawLineDDA(rightCameraPosition, leftCameraPosition, viewPlaneColor, this.renderBuffer);
-
-        this.renderBuffer.plotPixel(this.player.position.x, this.player.position.y, playerColor);
-    }
-
     render = (delta) => {
         this.renderBackground();
 
         this.renderWalls();
 
-        this.renderPlayer();
+        this.player.render(this.renderBuffer);
 
         this.renderBuffer.applyImageData();
     }
@@ -159,35 +222,6 @@ class Application {
         const lineColor = new Color(0, 0, 255, 255);
         drawLineDDA(lineStartCoord, lineEndCoord, lineColor, this.renderBuffer);
     }
-
-    onKey = (event, keyCode, pressed) => {
-        switch (keyCode) {
-            case keyCodes.UP_ARROW: {
-                this.player.position.addEqual(this.player.direction);
-                event.preventDefault();
-                break;
-            }
-
-            case keyCodes.DOWN_ARROW: {
-                this.player.position.addEqual(this.player.direction.mulScalar(-1.0));
-                event.preventDefault();
-                break;
-            }
-
-            case keyCodes.LEFT_ARROW: {
-                this.player.position.addEqual(this.player.direction);
-                event.preventDefault();
-                break;
-            }
-
-            case keyCodes.RIGHT_ARROW: {
-                this.player.position.addEqual(this.player.direction.mulScalar(-1.0));
-                event.preventDefault();
-                break;
-            }
-        }
-    }
-
 }
 
 // Rendering functions
@@ -236,15 +270,6 @@ window.onload = function () {
 
     function main(tframe) {
         let app = new Application();
-
-        // Register input events
-        window.addEventListener('keydown', function (event) {
-            app.onKey(event, event.keyCode, true);
-        }, false);
-        window.addEventListener('keyup', function (event) {
-            app.onKey(event, event.keyCode, false);
-        }, false);
-
         app.init(30);
         app.update(0);
     }
