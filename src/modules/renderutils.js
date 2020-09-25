@@ -1,6 +1,9 @@
 import {
     Vector2D
 } from './vector2d.js';
+import {
+    Color
+} from './color.js';
 
 class RenderBuffer {
     constructor(canvas) {
@@ -20,6 +23,14 @@ class RenderBuffer {
         this.imagedata.data[pixelIndex + 1] = color.g;
         this.imagedata.data[pixelIndex + 2] = color.b;
         this.imagedata.data[pixelIndex + 3] = color.a;
+    }
+
+    clear = (clearColor) => {
+        for (let x = 0; x <= this.width; x++) {
+            for (let y = 0; y <= this.height; y++) {
+                this.plotPixel(x, y, clearColor);
+            }
+        }
     }
 
 

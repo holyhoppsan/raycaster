@@ -17,6 +17,10 @@ import {
     renderWallSegment
 } from './modules/renderutils.js'
 
+import {
+    Level
+} from './modules/level.js'
+
 class Player {
     constructor(spawnPosition, spawnDirection, fieldOfView, movementSpeed, rotationSpeed) {
         this.position = spawnPosition;
@@ -143,6 +147,8 @@ class Application {
         //Temporary game logic variables
         this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(-1.0, 0.0), 45, 50.0, 1.0);
         this.playerController = new PlayerController(this.player);
+
+        this.level = new Level(new Vector2D(20, 20));
     }
 
     init = (fps) => {
@@ -192,9 +198,13 @@ class Application {
     }
 
     render = (delta) => {
-        this.renderBackground();
+        //this.renderBackground();
 
-        this.renderWalls();
+        //this.renderWalls();
+
+        this.renderBuffer.clear(new Color(0, 0, 0, 255));
+
+        this.level.render(this.renderBuffer);
 
         this.player.render(this.renderBuffer);
 
