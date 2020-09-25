@@ -18,10 +18,12 @@ import {
 } from './modules/renderutils.js'
 
 class Player {
-    constructor(spawnPosition, spawnDirection, viewPlane) {
+    constructor(spawnPosition, spawnDirection, viewPlane, movementSpeed, rotationSpeed) {
         this.position = spawnPosition;
         this.direction = spawnDirection;
         this.viewPlane = viewPlane;
+        this.movementSpeed = movementSpeed;
+        this.rotationSpeed = rotationSpeed;
     }
 
     get position() {
@@ -46,6 +48,22 @@ class Player {
 
     set viewPlane(value) {
         this._viewPlane = value;
+    }
+
+    get movementSpeed() {
+        return this._movementSpeed;
+    }
+
+    set movementSpeed(value) {
+        this._movementSpeed = value;
+    }
+
+    get rotationSpeed() {
+        return this._rotationSpeed;
+    }
+
+    set rotationSpeed(value) {
+        this._rotationSpeed = value;
     }
 
     render = (renderTarget) => {
@@ -80,34 +98,35 @@ class PlayerController {
     set player(value) {
         this._player = value;
     }
+    currentKeyboardState = {};
+
+    update = (deltaTime) => {
+        if (this.currentKeyboardState[keyCodes.UP_ARROW]) {
+            this.player.position.addEqual(this.player.direction.mulScalar(this.player.movementSpeed * deltaTime));
+        }
+
+        if (this.currentKeyboardState[keyCodes.DOWN_ARROW]) {
+            this.player.position.addEqual(this.player.direction.mulScalar(-1.0).mulScalar(this.player.movementSpeed * deltaTime));
+        }
+
+        if (this.currentKeyboardState[keyCodes.LEFT_ARROW]) {
+            this.player.direction.rotate2D(-this.player.rotationSpeed * deltaTime);
+            this.player.viewPlane.rotate2D(-this.player.rotationSpeed * deltaTime);
+        }
+
+        if (this.currentKeyboardState[keyCodes.RIGHT_ARROW]) {
+            this.player.direction.rotate2D(this.player.rotationSpeed * deltaTime);
+            this.player.viewPlane.rotate2D(this.player.rotationSpeed * deltaTime);
+        }
+    }
 
     onKey = (event, keyCode, pressed) => {
         if (pressed) {
-            switch (keyCode) {
-                case keyCodes.UP_ARROW: {
-                    this.player.position.addEqual(this.player.direction);
-                    event.preventDefault();
-                    break;
-                }
-
-                case keyCodes.DOWN_ARROW: {
-                    this.player.position.addEqual(this.player.direction.mulScalar(-1.0));
-                    event.preventDefault();
-                    break;
-                }
-
-                case keyCodes.LEFT_ARROW: {
-                    this.player.position.addEqual(this.player.direction);
-                    event.preventDefault();
-                    break;
-                }
-
-                case keyCodes.RIGHT_ARROW: {
-                    this.player.position.addEqual(this.player.direction.mulScalar(-1.0));
-                    event.preventDefault();
-                    break;
-                }
-            }
+            this.currentKeyboardState[keyCode] = true;
+            event.preventDefault();
+        } else {
+            this.currentKeyboardState[keyCode] = false;
+            event.preventDefault();
         }
     }
 }
@@ -122,7 +141,7 @@ class Application {
         this.renderBuffer = new RenderBuffer(document.getElementById("viewport"));
 
         //Temporary game logic variables
-        this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(-1.0, 0.0), new Vector2D(0.0, 0.66));
+        this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(-1.0, 0.0), new Vector2D(0.0, 0.66), 50.0, 1.0);
         this.playerController = new PlayerController(this.player);
     }
 
@@ -140,7 +159,7 @@ class Application {
         let boundOnKeyUp = (event) => {
             this.playerController.onKey(event, event.keyCode, false);
         };
-        window.addEventListener('keydown', boundOnKeyUp, false);
+        window.addEventListener('keyup', boundOnKeyUp, false);
     }
 
     update = (timeStamp) => {
@@ -152,13 +171,15 @@ class Application {
         this.previousTimeStampMs = timeStamp;
 
         this.timeSinceLastTick += elapsedTimeMs;
+        const timeSinceLastTickSeconds = this.timeSinceLastTick / this.oneSecInMS;
 
         if (frameRateIsUnbound || Math.abs(this.timeSinceLastTick - this.fpsInterval) < this.frameDeltaComparisonEpsilon || this.timeSinceLastTick > this.fpsInterval) {
 
             // Update game logic
+            this.playerController.update(timeSinceLastTickSeconds);
 
             // Do rendering here.
-            this.render(this.timeSinceLastTick);
+            this.render(timeSinceLastTickSeconds);
 
             const currentFPS = this.oneSecInMS / this.timeSinceLastTick;
 

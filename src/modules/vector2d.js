@@ -68,6 +68,12 @@ class Vector2D {
         this.x *= scalar;
         this.y *= scalar;
     }
+
+    rotate2D(radian) {
+        const cachedXValue = this.x;
+        this.x = cachedXValue * Math.cos(radian) - this.y * Math.sin(radian);
+        this.y = cachedXValue * Math.sin(radian) + this.y * Math.cos(radian);
+    }
 }
 
 export {
