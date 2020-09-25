@@ -17,12 +17,14 @@ class RenderBuffer {
     }
 
     plotPixel(x, y, color) {
-        const pixelIndex = ((y * this.imagedata.width) + x) * this.stride;
+        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+            const pixelIndex = ((y * this.imagedata.width) + x) * this.stride;
 
-        this.imagedata.data[pixelIndex] = color.r;
-        this.imagedata.data[pixelIndex + 1] = color.g;
-        this.imagedata.data[pixelIndex + 2] = color.b;
-        this.imagedata.data[pixelIndex + 3] = color.a;
+            this.imagedata.data[pixelIndex] = color.r;
+            this.imagedata.data[pixelIndex + 1] = color.g;
+            this.imagedata.data[pixelIndex + 2] = color.b;
+            this.imagedata.data[pixelIndex + 3] = color.a;
+        }
     }
 
     clear = (clearColor) => {
