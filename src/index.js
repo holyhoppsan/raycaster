@@ -18,10 +18,10 @@ import {
 } from './modules/renderutils.js'
 
 class Player {
-    constructor(spawnPosition, spawnDirection, viewPlane, movementSpeed, rotationSpeed) {
+    constructor(spawnPosition, spawnDirection, fieldOfView, movementSpeed, rotationSpeed) {
         this.position = spawnPosition;
         this.direction = spawnDirection;
-        this.viewPlane = viewPlane;
+        this.viewPlane = new Vector2D(0.0, Math.sin(fieldOfView * 2.0 * Math.PI / 180.0));
         this.movementSpeed = movementSpeed;
         this.rotationSpeed = rotationSpeed;
     }
@@ -141,7 +141,7 @@ class Application {
         this.renderBuffer = new RenderBuffer(document.getElementById("viewport"));
 
         //Temporary game logic variables
-        this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(-1.0, 0.0), new Vector2D(0.0, 0.66), 50.0, 1.0);
+        this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(-1.0, 0.0), 45, 50.0, 1.0);
         this.playerController = new PlayerController(this.player);
     }
 
