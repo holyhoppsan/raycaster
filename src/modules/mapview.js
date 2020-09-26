@@ -85,9 +85,9 @@ class MapView {
             const scaledViewPlaneVector = this.player.viewPlane.mulScalar(rayStep);
             const rayDirection = this.player.direction.add(scaledViewPlaneVector);
 
-            const perpendicularWallDistance = this.level.rayCast(rayDirection);
+            const rayResult = this.level.rayCast(rayDirection);
 
-            this.renderRayEuclidean(rayDirection, perpendicularWallDistance, renderTarget);
+            this.renderRayEuclidean(rayDirection, rayResult.perpendicularWallDistance, renderTarget);
         }
     }
 

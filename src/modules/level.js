@@ -72,16 +72,16 @@ class Level {
         // traverse the ray direction
         let stepCounter = new Vector2D(clampedplayerLocationGridSpace.x, clampedplayerLocationGridSpace.y);
         let hit = false;
-        let side = 0;
+        let facingNorthOrSouth = false;
         while (hit != true) {
             if (rayCastDistance.x < rayCastDistance.y) {
                 stepCounter.x += stepIncrement.x;
                 rayCastDistance.x += deltaDistance.x;
-                side = 0;
+                facingNorthOrSouth = false;
             } else {
                 stepCounter.y += stepIncrement.y;
                 rayCastDistance.y += deltaDistance.y;
-                side = 1;
+                facingNorthOrSouth = true;
             }
 
             if (this.grid[stepCounter.y * this.gridSize.x + stepCounter.x] > 0) {
@@ -90,7 +90,7 @@ class Level {
         }
 
         let perpendicularWallDistance = 0;
-        if (side == 0) {
+        if (facingNorthOrSouth == 0) {
             const gridDistance = ((stepCounter.x - playerLocationGridSpace.x) + (1 - stepIncrement.x) / 2);
             perpendicularWallDistance = (rayDirection.x == 0) ? gridDistance : gridDistance / rayDirection.x;
         } else {
@@ -98,7 +98,10 @@ class Level {
             perpendicularWallDistance = (rayDirection.y == 0) ? gridDistance : gridDistance / rayDirection.y;
         }
 
-        return perpendicularWallDistance;
+        return {
+            perpendicularWallDistance,
+            facingNorthOrSouth
+        };
     }
 }
 

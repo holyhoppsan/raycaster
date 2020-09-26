@@ -28,6 +28,9 @@ import {
 import {
     MapView
 } from './modules/mapview.js'
+import {
+    RayCastView
+} from './modules/raycastview.js';
 
 class PlayerController {
     constructor(player) {
@@ -89,7 +92,8 @@ class Application {
 
         this.level = new Level(new Vector2D(10, 10), this.player);
 
-        this.MapView = new MapView(this.player, this.level);
+        this.mapView = new MapView(this.player, this.level);
+        this.rayCastView = new RayCastView(this.player, this.level);
     }
 
     init = (fps) => {
@@ -145,7 +149,9 @@ class Application {
 
         this.renderBuffer.clear(new Color(0, 0, 0, 255));
 
-        this.MapView.render(this.renderBuffer);
+        //this.mapView.render(this.renderBuffer);
+
+        this.rayCastView.render(this.renderBuffer);
 
         this.renderBuffer.applyImageData();
     }
