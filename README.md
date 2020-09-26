@@ -9,8 +9,6 @@ h2. TODO
 * refactor the application into its own function
 * add Jest tests
 * add texture rendering
-* refactor the input controls
-* add toggle for the different rendering views
 * tidy up readme
 * add player collision
 * add strafe

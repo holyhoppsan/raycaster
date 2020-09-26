@@ -29,9 +29,14 @@ import {
     RayCastView
 } from './modules/raycastview.js';
 
+import {
+    InputProcessor
+} from './modules/inputprocessor.js'
+
 class PlayerController {
-    constructor(player) {
+    constructor(player, inputProcessor) {
         this.player = player;
+        this.inputProcessor = inputProcessor;
     }
 
     get player() {
@@ -41,35 +46,32 @@ class PlayerController {
     set player(value) {
         this._player = value;
     }
-    currentKeyboardState = {};
+
+    get inputProcessor() {
+        return this._inputProcessor;
+    }
+
+    set inputProcessor(value) {
+        this._inputProcessor = value;
+    }
 
     update = (deltaTime) => {
-        if (this.currentKeyboardState[keyCodes.UP_ARROW]) {
+        if (this.inputProcessor.currentKeyboardState[keyCodes.UP_ARROW]) {
             this.player.position.addEqual(this.player.direction.mulScalar(this.player.movementSpeed * deltaTime));
         }
 
-        if (this.currentKeyboardState[keyCodes.DOWN_ARROW]) {
+        if (this.inputProcessor.currentKeyboardState[keyCodes.DOWN_ARROW]) {
             this.player.position.addEqual(this.player.direction.mulScalar(-1.0).mulScalar(this.player.movementSpeed * deltaTime));
         }
 
-        if (this.currentKeyboardState[keyCodes.LEFT_ARROW]) {
+        if (this.inputProcessor.currentKeyboardState[keyCodes.LEFT_ARROW]) {
             this.player.direction.rotate2D(-this.player.rotationSpeed * deltaTime);
             this.player.viewPlane.rotate2D(-this.player.rotationSpeed * deltaTime);
         }
 
-        if (this.currentKeyboardState[keyCodes.RIGHT_ARROW]) {
+        if (this.inputProcessor.currentKeyboardState[keyCodes.RIGHT_ARROW]) {
             this.player.direction.rotate2D(this.player.rotationSpeed * deltaTime);
             this.player.viewPlane.rotate2D(this.player.rotationSpeed * deltaTime);
-        }
-    }
-
-    onKey = (event, keyCode, pressed) => {
-        if (pressed) {
-            this.currentKeyboardState[keyCode] = true;
-            event.preventDefault();
-        } else {
-            this.currentKeyboardState[keyCode] = false;
-            event.preventDefault();
         }
     }
 }
@@ -83,11 +85,15 @@ class Application {
         this.fpsInterval;
         this.renderBuffer = new RenderBuffer(document.getElementById("viewport"));
 
+        this.inputProcessor = new InputProcessor();
+
         //Temporary game logic variables
         this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(1.0, 0.0), 90, 50.0, 1.0);
-        this.playerController = new PlayerController(this.player);
+        this.playerController = new PlayerController(this.player, this.inputProcessor);
 
         this.level = new Level(new Vector2D(10, 10), this.player);
+
+        this.mapViewEnabled = false;
 
         this.mapView = new MapView(this.player, this.level);
         this.rayCastView = new RayCastView(this.player, this.level);
@@ -97,17 +103,6 @@ class Application {
         this.fpsInterval = this.oneSecInMS / fps;
         this.previousTimeStampMs = 0;
         this.timeSinceLastTick = 0;
-
-        // Register input events
-        let boundOnKeyDown = (event) => {
-            this.playerController.onKey(event, event.keyCode, true);
-        };
-        window.addEventListener('keydown', boundOnKeyDown, false);
-
-        let boundOnKeyUp = (event) => {
-            this.playerController.onKey(event, event.keyCode, false);
-        };
-        window.addEventListener('keyup', boundOnKeyUp, false);
     }
 
     update = (timeStamp) => {
@@ -126,6 +121,10 @@ class Application {
             // Update game logic
             this.playerController.update(timeSinceLastTickSeconds);
 
+            if (this.inputProcessor.currentKeyboardState[keyCodes.KEY_1]) {
+                this.mapViewEnabled = !this.mapViewEnabled;
+            }
+
             // Do rendering here.
             this.render(timeSinceLastTickSeconds);
 
@@ -142,9 +141,11 @@ class Application {
     render = (delta) => {
         this.renderBuffer.clear(new Color(0, 0, 0, 255));
 
-        //this.mapView.render(this.renderBuffer);
-
-        this.rayCastView.render(this.renderBuffer);
+        if (this.mapViewEnabled) {
+            this.mapView.render(this.renderBuffer);
+        } else {
+            this.rayCastView.render(this.renderBuffer);
+        }
 
         this.renderBuffer.applyImageData();
     }
