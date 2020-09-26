@@ -114,8 +114,6 @@ class Level {
         this.renderMapGrid(renderBuffer);
 
         this.renderPlayerViewEuclidean(renderBuffer);
-
-        this.renderPlayer(new Vector2D(renderBuffer.width / 2, renderBuffer.height / 2), renderBuffer);
     }
 
     renderRayEuclidean = (rayDirection, perpendicularWallDistance, renderTarget) => {
@@ -170,25 +168,6 @@ class Level {
                 drawLineDDA(new Vector2D(mapScreenStartPositionX, yPosition), new Vector2D(mapScreenEndPositionX, yPosition), new Color(0, 255, 0, 255), renderTarget);
             }
         }
-    }
-
-    renderPlayer = (screenPosition, renderTarget) => {
-        const playerColor = new Color(255, 0, 0, 255);
-        const viewPlaneColor = new Color(0, 255, 0, 255);
-
-        const extensionFactor = 20;
-        const extendedVector = screenPosition.add(this.player.direction.mulScalar(extensionFactor));
-        drawLineDDA(screenPosition, extendedVector, playerColor, renderTarget);
-
-        const leftCameraPosition = screenPosition.add(this.player.direction.add(this.player.viewPlane).mulScalar(extensionFactor));
-        drawLineDDA(screenPosition, leftCameraPosition, playerColor, renderTarget);
-
-        const rightCameraPosition = screenPosition.add(this.player.direction.sub(this.player.viewPlane).mulScalar(extensionFactor));
-        drawLineDDA(screenPosition, rightCameraPosition, playerColor, renderTarget);
-
-        drawLineDDA(rightCameraPosition, leftCameraPosition, viewPlaneColor, renderTarget);
-
-        renderTarget.plotPixel(screenPosition.x, screenPosition.y, playerColor);
     }
 }
 

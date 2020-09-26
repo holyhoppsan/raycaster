@@ -25,6 +25,10 @@ import {
     Player
 } from './modules/player.js'
 
+import {
+    MapView
+} from './modules/mapview.js'
+
 class PlayerController {
     constructor(player) {
         this.player = player;
@@ -84,6 +88,8 @@ class Application {
         this.playerController = new PlayerController(this.player);
 
         this.level = new Level(new Vector2D(10, 10), this.player);
+
+        this.MapView = new MapView(this.player);
     }
 
     init = (fps) => {
@@ -140,6 +146,8 @@ class Application {
         this.renderBuffer.clear(new Color(0, 0, 0, 255));
 
         this.level.render(this.renderBuffer);
+
+        this.MapView.render(this.renderBuffer);
 
         this.renderBuffer.applyImageData();
     }
