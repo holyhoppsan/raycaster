@@ -74,6 +74,10 @@ class Vector2D {
         this.x = cachedXValue * Math.cos(radian) - this.y * Math.sin(radian);
         this.y = cachedXValue * Math.sin(radian) + this.y * Math.cos(radian);
     }
+
+    length() {
+        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+    }
 }
 
 export {

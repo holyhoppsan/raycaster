@@ -6,7 +6,9 @@ class Player {
     constructor(spawnPosition, spawnDirection, fieldOfView, movementSpeed, rotationSpeed) {
         this.position = spawnPosition;
         this.direction = spawnDirection;
-        this.viewPlane = new Vector2D(0.0, Math.sin(fieldOfView * 2.0 * Math.PI / 180.0));
+        const vectorPerpendicularToPlayerDirection = new Vector2D(-this.direction.y, this.direction.x);
+        const fieldOfViewInRadians = fieldOfView / 2.0 * Math.PI / 180.0;
+        this.viewPlane = vectorPerpendicularToPlayerDirection; //.mul(new Vector2D(Math.cos(fieldOfViewInRadians), Math.sin(fieldOfViewInRadians)));
         this.movementSpeed = movementSpeed;
         this.rotationSpeed = rotationSpeed;
     }

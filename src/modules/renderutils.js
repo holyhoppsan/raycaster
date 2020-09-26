@@ -17,8 +17,10 @@ class RenderBuffer {
     }
 
     plotPixel(x, y, color) {
-        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-            const pixelIndex = ((y * this.imagedata.width) + x) * this.stride;
+        const clampedX = Math.round(x);
+        const clampedY = Math.round(y);
+        if (clampedX >= 0 && clampedX < this.width && clampedY >= 0 && clampedY < this.height) {
+            const pixelIndex = ((clampedY * this.imagedata.width) + clampedX) * this.stride;
 
             this.imagedata.data[pixelIndex] = color.r;
             this.imagedata.data[pixelIndex + 1] = color.g;
@@ -68,13 +70,13 @@ function drawLineDDA(startPos, endPos, color, renderBuffer) {
     let y = startPos.y;
 
     //plot initial pixel
-    renderBuffer.plotPixel(Math.round(x), Math.round(y), color);
+    renderBuffer.plotPixel(x, y, color);
 
     for (let stepIndex = 0; stepIndex < steps; stepIndex++) {
         x += xIncrement;
         y += yIncrement;
 
-        renderBuffer.plotPixel(Math.round(x), Math.round(y), color);
+        renderBuffer.plotPixel(x, y, color);
     }
 }
 
