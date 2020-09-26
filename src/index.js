@@ -89,7 +89,7 @@ class Application {
 
         this.level = new Level(new Vector2D(10, 10), this.player);
 
-        this.MapView = new MapView(this.player);
+        this.MapView = new MapView(this.player, this.level);
     }
 
     init = (fps) => {
@@ -144,8 +144,6 @@ class Application {
         //this.renderWalls();
 
         this.renderBuffer.clear(new Color(0, 0, 0, 255));
-
-        this.level.render(this.renderBuffer);
 
         this.MapView.render(this.renderBuffer);
 
