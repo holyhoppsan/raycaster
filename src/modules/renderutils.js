@@ -80,13 +80,8 @@ function drawLineDDA(startPos, endPos, color, renderBuffer) {
     }
 }
 
-function renderWallSegment(xPos, yStart, yEnd, color, renderBuffer) {
-    drawLineDDA(new Vector2D(xPos, yStart), new Vector2D(xPos, yEnd), color, renderBuffer);
-}
-
 export {
     RenderBuffer,
     drawRect,
-    drawLineDDA,
-    renderWallSegment
+    drawLineDDA
 }

@@ -11,10 +11,7 @@ import {
 } from './modules/color.js';
 
 import {
-    RenderBuffer,
-    drawRect,
-    drawLineDDA,
-    renderWallSegment
+    RenderBuffer
 } from './modules/renderutils.js'
 
 import {
