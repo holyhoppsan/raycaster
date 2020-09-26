@@ -3,7 +3,8 @@ import {
 } from './vector2d.js';
 
 import {
-    drawLineDDA
+    drawLineDDA,
+    drawRect
 } from './renderutils.js';
 
 import {
@@ -33,6 +34,9 @@ class RayCastView {
     }
 
     render = (renderTarget) => {
+
+        this.renderBackground(renderTarget);
+
         for (let x = 0; x < renderTarget.width; x += 1) {
             const rayStep = (2 * (x / renderTarget.width)) - 1;
 
@@ -50,6 +54,14 @@ class RayCastView {
 
             drawLineDDA(lineStart, lineEnd, color, renderTarget);
         }
+    }
+
+    renderBackground = (renderTarget) => {
+        // Render the sky
+        const skyStartCoord = new Vector2D(0, 0);
+        const skyEndCoord = new Vector2D(renderTarget.width, renderTarget.height / 2);
+        const skyColor = new Color(135, 206, 250, 255);
+        drawRect(skyStartCoord, skyEndCoord, skyColor, renderTarget);
     }
 }
 

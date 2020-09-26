@@ -143,10 +143,6 @@ class Application {
     }
 
     render = (delta) => {
-        //this.renderBackground();
-
-        //this.renderWalls();
-
         this.renderBuffer.clear(new Color(0, 0, 0, 255));
 
         //this.mapView.render(this.renderBuffer);
@@ -154,30 +150,6 @@ class Application {
         this.rayCastView.render(this.renderBuffer);
 
         this.renderBuffer.applyImageData();
-    }
-
-    renderBackground = () => {
-        // Render the sky
-        const skyStartCoord = new Vector2D(0, 0);
-        const skyEndCoord = new Vector2D(this.renderBuffer.width, this.renderBuffer.height / 2);
-        const skyColor = new Color(135, 206, 250, 255);
-        drawRect(skyStartCoord, skyEndCoord, skyColor, this.renderBuffer);
-
-        // Render floor
-        const floorStartCoord = new Vector2D(0, this.renderBuffer.height / 2);
-        const floorEndCoord = new Vector2D(this.renderBuffer.width, this.renderBuffer.height);
-        const floorColor = new Color(0, 0, 0, 255);
-        drawRect(floorStartCoord, floorEndCoord, floorColor, this.renderBuffer);
-    }
-
-    renderWalls = () => {
-        const wallColor = new Color(255, 0, 0, 255);
-        renderWallSegment(45, 120, 160, wallColor, this.renderBuffer);
-
-        const lineStartCoord = new Vector2D(40, 160);
-        const lineEndCoord = new Vector2D(50, 120);
-        const lineColor = new Color(0, 0, 255, 255);
-        drawLineDDA(lineStartCoord, lineEndCoord, lineColor, this.renderBuffer);
     }
 }
 
