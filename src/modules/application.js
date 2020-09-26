@@ -50,9 +50,8 @@ class Application {
 
         //Temporary game logic variables
         this.player = new Player(new Vector2D(100.0, 100.0), new Vector2D(1.0, 0.0), 90, 50.0, 1.0);
-        this.playerController = new PlayerController(this.player, this.inputProcessor);
-
         this.level = new Level(new Vector2D(10, 10), this.player);
+        this.playerController = new PlayerController(this.player, this.level, this.inputProcessor);
 
         this.mapViewEnabled = false;
 
