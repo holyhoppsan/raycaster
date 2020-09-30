@@ -47,8 +47,9 @@ class Level {
         const playerLocationGridSpace = new Vector2D(this.player.position.x / this.cellSize, this.player.position.y / this.cellSize);
         const clampedplayerLocationGridSpace = new Vector2D(Math.floor(playerLocationGridSpace.x), Math.floor(playerLocationGridSpace.y));
 
-        const deltaDistance = new Vector2D(rayDirection.x != 0.0 ? Math.abs(1.0 / rayDirection.x) : 0.0,
-            rayDirection.y != 0.0 ? Math.abs(1.0 / rayDirection.y) : 0.0);
+        const deltaDistanceX = (rayDirection.y == 0) ? 0 : rayDirection.x == 0 ? 1 : Math.abs(1.0 / rayDirection.x);
+        const deltaDistanceY = (rayDirection.x == 0) ? 0 : rayDirection.y == 0 ? 1 : Math.abs(1.0 / rayDirection.y);
+        const deltaDistance = new Vector2D(deltaDistanceX, deltaDistanceY);
 
         let stepIncrement = new Vector2D(0, 0);
         let rayCastDistance = new Vector2D(0, 0);

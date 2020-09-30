@@ -9,5 +9,4 @@ h2. TODO
 * add texture rendering
 * tidy up readme
 * add player collision
-* fix line rendering error on middle line when starting into the app
 * Add key pressed handling
