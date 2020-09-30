@@ -37,6 +37,7 @@ class RayCastView {
 
         this.renderBackground(renderTarget);
 
+        // for (let x = 160; x < 161 /*renderTarget.width*/ ; x += 1) {
         for (let x = 0; x < renderTarget.width; x += 1) {
             const rayStep = (2 * (x / renderTarget.width)) - 1;
 
@@ -45,7 +46,8 @@ class RayCastView {
 
             const rayResult = this.level.rayCast(rayDirection);
 
-            const lineHeight = renderTarget.height / rayResult.perpendicularWallDistance;
+            const aspectRatio = renderTarget.width / renderTarget.height;
+            const lineHeight = renderTarget.height / rayResult.perpendicularWallDistance / aspectRatio;
 
             const lineStart = new Vector2D(x, -lineHeight / 2 + renderTarget.height / 2);
             const lineEnd = new Vector2D(x, lineHeight / 2 + renderTarget.height / 2);

@@ -5,7 +5,6 @@ A Single page application (SPA)
 h2. TODO
 
 * Add field of view control
-* Fix box height
 * add Jest tests
 * add texture rendering
 * tidy up readme
