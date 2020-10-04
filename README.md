@@ -10,3 +10,4 @@ h2. TODO
 * tidy up readme
 * add player collision
 * Add key pressed handling
+* Add level loading from file

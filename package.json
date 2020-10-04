@@ -1,6 +1,6 @@
 {
-    "name": "pathtracer",
-    "description": "A simple javascript path tracer",
+    "name": "raycaster",
+    "description": "A simple javascript raycaster",
     "authors": "Daniel Hall",
     "version": "1.0.0",
     "main": "src/index.js",
