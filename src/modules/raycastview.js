@@ -37,7 +37,6 @@ class RayCastView {
 
         this.renderBackground(renderTarget);
 
-        // for (let x = 160; x < 161 /*renderTarget.width*/ ; x += 1) {
         for (let x = 0; x < renderTarget.width; x += 1) {
             const rayStep = (2 * (x / renderTarget.width)) - 1;
 
