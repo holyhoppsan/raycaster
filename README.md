@@ -11,4 +11,3 @@ h2. TODO
 * add player collision
 * Add key pressed handling
 * Add level loading from file
-* Refactor out the player dependency from the level

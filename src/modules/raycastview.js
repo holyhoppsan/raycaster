@@ -43,7 +43,7 @@ class RayCastView {
             const scaledViewPlaneVector = this.player.viewPlane.mulScalar(rayStep);
             const rayDirection = this.player.direction.add(scaledViewPlaneVector);
 
-            const rayResult = this.level.rayCast(rayDirection);
+            const rayResult = this.level.rayCast(rayDirection, this.player);
 
             const aspectRatio = renderTarget.width / renderTarget.height;
             const lineHeight = renderTarget.height / rayResult.perpendicularWallDistance / aspectRatio;

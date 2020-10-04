@@ -2,14 +2,10 @@ import {
     Vector2D
 } from './vector2d.js';
 
-import {
-    Player
-} from './player.js'
-
 class Level {
     cellSize = 25;
 
-    constructor(gridSize, player) {
+    constructor(gridSize) {
         //this.grid = new Array(gridSize.x * gridSize.y).fill(0);
 
         this.grid = new Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -23,7 +19,6 @@ class Level {
             1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
         this.gridSize = gridSize;
-        this.player = player;
     }
 
     get gridSize() {
@@ -34,17 +29,9 @@ class Level {
         this._gridSize = value;
     }
 
-    get player() {
-        return this._player;
-    }
-
-    set player(value) {
-        this._player = value;
-    }
-
-    rayCast(rayDirection) {
+    rayCast(rayDirection, player) {
         // convert player position into map square
-        const playerLocationGridSpace = new Vector2D(this.player.position.x / this.cellSize, this.player.position.y / this.cellSize);
+        const playerLocationGridSpace = new Vector2D(player.position.x / this.cellSize, player.position.y / this.cellSize);
         const clampedplayerLocationGridSpace = new Vector2D(Math.floor(playerLocationGridSpace.x), Math.floor(playerLocationGridSpace.y));
 
         const deltaDistanceX = (rayDirection.y == 0) ? 0 : rayDirection.x == 0 ? 1 : Math.abs(1.0 / rayDirection.x);
