@@ -6,18 +6,18 @@ class Level {
     cellSize = 25;
 
     constructor(gridSize) {
-        //this.grid = new Array(gridSize.x * gridSize.y).fill(0);
+        this.grid = new Array(gridSize.x * gridSize.y).fill(0);
 
-        this.grid = new Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+        // this.grid = new Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        //     1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        //     1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        //     1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        //     1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        //     1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        //     1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
+        //     1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        //     1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        //     1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
         this.gridSize = gridSize;
     }
 
@@ -28,6 +28,37 @@ class Level {
     set gridSize(value) {
         this._gridSize = value;
     }
+
+    // generateLevelJsonForDownload() {
+    //     const url = URL.createObjectURL(new Blob([JSON.stringify(this, null, 2)], {
+    //         type: 'application/json'
+    //     }));
+
+    //     const link = document.createElement('a');
+
+    //     link.href = url;
+    //     link.innerText = "Download level json";
+
+    //     document.body.appendChild(link);
+    // };
+
+    // readLevelFromFile(event) {
+    //     var file = event.target.files[0];
+    //     if (!file) {
+    //         return;
+    //     }
+    //     let reader = new FileReader();
+    //     reader.addEventListener('load', (loadEvent) => {
+    //         try {
+    //             let json = JSON.parse(loadEvent.target.result);
+    //             let serializedObject = JSON.parse(json);
+    //             Object.assign(this, serializedObject);
+    //         } catch (error) {
+    //             console.log(error);
+    //         }
+    //     });
+    //     reader.readAsText(file);
+    // }
 
     rayCast(rayDirection, player) {
         // convert player position into map square

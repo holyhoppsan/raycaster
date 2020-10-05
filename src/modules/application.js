@@ -64,6 +64,10 @@ class Application {
         this.fpsInterval = this.oneSecInMS / fps;
         this.previousTimeStampMs = 0;
         this.timeSinceLastTick = 0;
+
+        // this.level.generateLevelJsonForDownload();
+        //document.getElementById('file-input').addEventListener('change', this.level.readLevelFromFile, false);
+        //this.level.readLevelFromFile("../level/level1.json");
     }
 
     update = (timeStamp) => {
