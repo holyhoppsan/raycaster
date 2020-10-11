@@ -80,8 +80,20 @@ function drawLineDDA(startPos, endPos, color, renderBuffer) {
     }
 }
 
+
+function getPixelColorFromImage(x, y, imageData) {
+    const stride = 4;
+    const pixelIndex = ((y * imageData.width) + x) * stride;
+
+    return new Color(imageData.data[pixelIndex],
+        imageData.data[pixelIndex + 1],
+        imageData.data[pixelIndex + 2],
+        imageData.data[pixelIndex + 3]);
+}
+
 export {
     RenderBuffer,
     drawRect,
-    drawLineDDA
+    drawLineDDA,
+    getPixelColorFromImage
 }

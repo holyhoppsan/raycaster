@@ -4,7 +4,8 @@ import {
 
 import {
     drawLineDDA,
-    drawRect
+    drawRect,
+    getPixelColorFromImage
 } from './renderutils.js';
 
 import {
@@ -15,6 +16,16 @@ class RayCastView {
     constructor(player, level) {
         this.player = player;
         this.level = level;
+
+        this.wallTexture = document.getElementById("walltexture");
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = this.wallTexture.width;
+        this.canvas.height = this.wallTexture.height;
+        // document.body.appendChild(this.canvas);
+        this.ctx = this.canvas.getContext('2d');
+
+        this.ctx.drawImage(this.wallTexture, 0, 0);
+        this.wallImgData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     }
 
     get player() {
@@ -54,6 +65,13 @@ class RayCastView {
             const color = new Color(0, rayResult.facingNorthOrSouth ? 255 / 2 : 255, 0, 255);
 
             drawLineDDA(lineStart, lineEnd, color, renderTarget);
+        }
+
+        for (let x = 0; x < this.wallImgData.width; x++) {
+            for (let y = 0; y < this.wallImgData.height; y++) {
+                const wallPixelColor = getPixelColorFromImage(x, y, this.wallImgData);
+                renderTarget.plotPixel(x, y, wallPixelColor);
+            }
         }
     }
 
