@@ -62,16 +62,17 @@ class RayCastView {
             const lineStart = new Vector2D(x, -lineHeight / 2 + renderTarget.height / 2);
             const lineEnd = new Vector2D(x, lineHeight / 2 + renderTarget.height / 2);
 
-            const color = new Color(0, rayResult.facingNorthOrSouth ? 255 / 2 : 255, 0, 255);
+            // Read texture data
+            const u = Math.floor(rayResult.wallSegmentIntersectionFactor * 64);
+            let wallPixelColor = getPixelColorFromImage(u, 0, this.wallImgData);
 
-            drawLineDDA(lineStart, lineEnd, color, renderTarget);
-        }
-
-        for (let x = 0; x < this.wallImgData.width; x++) {
-            for (let y = 0; y < this.wallImgData.height; y++) {
-                const wallPixelColor = getPixelColorFromImage(x, y, this.wallImgData);
-                renderTarget.plotPixel(x, y, wallPixelColor);
+            if (rayResult.facingNorthOrSouth) {
+                wallPixelColor.r /= 2;
+                wallPixelColor.g /= 2;
+                wallPixelColor.b /= 2;
             }
+
+            drawLineDDA(lineStart, lineEnd, wallPixelColor, renderTarget);
         }
     }
 

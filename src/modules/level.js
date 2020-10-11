@@ -78,17 +78,23 @@ class Level {
         }
 
         let perpendicularWallDistance = 0;
+        let wallSegmentIntersectionFactor = 0;
         if (facingNorthOrSouth == 0) {
             const gridDistance = ((stepCounter.x - playerLocationGridSpace.x) + (1 - stepIncrement.x) / 2);
             perpendicularWallDistance = (rayDirection.x == 0) ? gridDistance : gridDistance / rayDirection.x;
+            wallSegmentIntersectionFactor = (playerLocationGridSpace.y + perpendicularWallDistance * rayDirection.y);
+            wallSegmentIntersectionFactor -= Math.floor(wallSegmentIntersectionFactor);
         } else {
             const gridDistance = ((stepCounter.y - playerLocationGridSpace.y) + (1 - stepIncrement.y) / 2);
             perpendicularWallDistance = (rayDirection.y == 0) ? gridDistance : gridDistance / rayDirection.y;
+            wallSegmentIntersectionFactor = (playerLocationGridSpace.x + perpendicularWallDistance * rayDirection.x);
+            wallSegmentIntersectionFactor -= Math.floor(wallSegmentIntersectionFactor);
         }
 
         return {
             perpendicularWallDistance,
-            facingNorthOrSouth
+            facingNorthOrSouth,
+            wallSegmentIntersectionFactor
         };
     }
 }

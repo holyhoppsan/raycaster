@@ -11,3 +11,5 @@ h2. TODO
 * add player collision
 * Add key pressed handling
 * Add level loading from file
+* Add credits for texture art.
+* Refactor texture out from the raycast view
