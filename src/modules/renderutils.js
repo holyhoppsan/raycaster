@@ -80,10 +80,54 @@ function drawLineDDA(startPos, endPos, color, renderBuffer) {
     }
 }
 
+function drawLineDDATextured(startPos, endPos, startTexCoord, endTexCoord, texture, renderBuffer) {
+    const dx = endPos.x - startPos.x;
+    const dy = endPos.y - startPos.y;
+
+    const dTexX = endTexCoord.x - startTexCoord.x;
+    const dTexY = endTexCoord.y - startTexCoord.y;
+
+    let steps;
+    if (Math.abs(dx) > Math.abs(dy)) {
+        steps = Math.abs(dx);
+    } else {
+        steps = Math.abs(dy);
+    }
+
+    const xIncrement = dx / steps;
+    const yIncrement = dy / steps;
+
+    const xTextureIncrement = dTexX / steps * texture.width;
+    const yTextureIncrement = dTexY / steps * texture.height;
+    const textureDimensions = new Vector2D(texture.width, texture.height);
+
+    let x = startPos.x;
+    let y = startPos.y;
+
+    let textureSampleCoord = startTexCoord.mul(textureDimensions);
+
+    let color = getPixelColorFromImage(textureSampleCoord.x, textureSampleCoord.y, texture);
+
+    //plot initial pixel
+    renderBuffer.plotPixel(x, y, color);
+
+    for (let stepIndex = 0; stepIndex < steps; stepIndex++) {
+        x += xIncrement;
+        y += yIncrement;
+
+        textureSampleCoord.x += xTextureIncrement;
+        textureSampleCoord.y += yTextureIncrement;
+
+        color = getPixelColorFromImage(textureSampleCoord.x, textureSampleCoord.y, texture);
+        renderBuffer.plotPixel(x, y, color);
+    }
+}
 
 function getPixelColorFromImage(x, y, imageData) {
+    const clampedX = Math.round(x);
+    const clampedY = Math.round(y);
     const stride = 4;
-    const pixelIndex = ((y * imageData.width) + x) * stride;
+    const pixelIndex = ((clampedY * imageData.width) + clampedX) * stride;
 
     return new Color(imageData.data[pixelIndex],
         imageData.data[pixelIndex + 1],
@@ -95,5 +139,6 @@ export {
     RenderBuffer,
     drawRect,
     drawLineDDA,
+    drawLineDDATextured,
     getPixelColorFromImage
 }

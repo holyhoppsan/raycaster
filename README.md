@@ -13,3 +13,8 @@ h2. TODO
 * Add level loading from file
 * Add credits for texture art.
 * Refactor texture out from the raycast view
+* Investigate why performance drops when rendering textured lines 
+* Add toggle for switching between texture mapping or not
+* Add tests for texture line rendering
+* Add lighting lambda to the textureed line rendering
+* Refactor the line drawing functions.

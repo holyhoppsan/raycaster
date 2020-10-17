@@ -57,7 +57,7 @@ class Application {
         this.mapViewEnabled = false;
 
         this.mapView = new MapView(this.player, this.level);
-        this.rayCastView = new RayCastView(this.player, this.level);
+        this.rayCastView = new RayCastView(this.player, this.level, this.textureMappingEnabled);
     }
 
     init = (fps) => {
@@ -84,6 +84,10 @@ class Application {
 
             if (this.inputProcessor.currentKeyboardState[keyCodes.KEY_1]) {
                 this.mapViewEnabled = !this.mapViewEnabled;
+            }
+
+            if (this.inputProcessor.currentKeyboardState[keyCodes.KEY_2]) {
+                this.rayCastView.texturedMappingEnabled = !this.rayCastView.texturedMappingEnabled;
             }
 
             // Do rendering here.

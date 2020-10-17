@@ -4,6 +4,7 @@ import {
 
 import {
     drawLineDDA,
+    drawLineDDATextured,
     drawRect,
     getPixelColorFromImage
 } from './renderutils.js';
@@ -13,15 +14,15 @@ import {
 } from './color.js';
 
 class RayCastView {
-    constructor(player, level) {
+    constructor(player, level, texturedMappingEnabled) {
         this.player = player;
         this.level = level;
+        this.texturedMappingEnabled = texturedMappingEnabled;
 
         this.wallTexture = document.getElementById("walltexture");
         this.canvas = document.createElement('canvas');
         this.canvas.width = this.wallTexture.width;
         this.canvas.height = this.wallTexture.height;
-        // document.body.appendChild(this.canvas);
         this.ctx = this.canvas.getContext('2d');
 
         this.ctx.drawImage(this.wallTexture, 0, 0);
@@ -44,12 +45,22 @@ class RayCastView {
         this._level = value;
     }
 
+    get texturedMappingEnabled() {
+        return this._textureMappingEnabled;
+    }
+
+    set texturedMappingEnabled(value) {
+        this._textureMappingEnabled = value;
+    }
+
     render = (renderTarget) => {
 
         this.renderBackground(renderTarget);
 
+        //for (let x = 160; x < 161; x += 1) {
         for (let x = 0; x < renderTarget.width; x += 1) {
-            const rayStep = (2 * (x / renderTarget.width)) - 1;
+            const xRatio = x / renderTarget.width;
+            const rayStep = (2 * (xRatio)) - 1;
 
             const scaledViewPlaneVector = this.player.viewPlane.mulScalar(rayStep);
             const rayDirection = this.player.direction.add(scaledViewPlaneVector);
@@ -62,17 +73,23 @@ class RayCastView {
             const lineStart = new Vector2D(x, -lineHeight / 2 + renderTarget.height / 2);
             const lineEnd = new Vector2D(x, lineHeight / 2 + renderTarget.height / 2);
 
-            // Read texture data
-            const u = Math.floor(rayResult.wallSegmentIntersectionFactor * 64);
-            let wallPixelColor = getPixelColorFromImage(u, 0, this.wallImgData);
+            if (this.texturedMappingEnabled == true) {
+                // Read texture data
+                const u = Math.floor(rayResult.wallSegmentIntersectionFactor * 64);
+                const v = lineStart.y - renderTarget.height / 2 + lineHeight / 2;
 
-            if (rayResult.facingNorthOrSouth) {
-                wallPixelColor.r /= 2;
-                wallPixelColor.g /= 2;
-                wallPixelColor.b /= 2;
+                drawLineDDATextured(lineStart, lineEnd, new Vector2D(rayResult.wallSegmentIntersectionFactor, 0.0), new Vector2D(rayResult.wallSegmentIntersectionFactor, 1.0), this.wallImgData, renderTarget);
+            } else {
+                let wallPixelColor = new Color(0, 255, 0, 255);
+
+                if (rayResult.facingNorthOrSouth) {
+                    wallPixelColor.r /= 2;
+                    wallPixelColor.g /= 2;
+                    wallPixelColor.b /= 2;
+                }
+
+                drawLineDDA(lineStart, lineEnd, wallPixelColor, renderTarget);
             }
-
-            drawLineDDA(lineStart, lineEnd, wallPixelColor, renderTarget);
         }
     }
 
