@@ -57,7 +57,7 @@ class Application {
         this.mapViewEnabled = false;
 
         this.mapView = new MapView(this.player, this.level);
-        this.rayCastView = new RayCastView(this.player, this.level, this.textureMappingEnabled);
+        this.rayCastView = new RayCastView(this.player, this.level, true);
     }
 
     init = (fps) => {
