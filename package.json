@@ -4,5 +4,8 @@
     "authors": "Daniel Hall",
     "version": "1.0.0",
     "main": "src/index.js",
-    "dependencies": {}
+    "dependencies": {},
+    "devDependencies": {
+        "jest": "^26.5.3"
+    }
 }
