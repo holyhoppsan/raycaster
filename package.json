@@ -3,9 +3,14 @@
     "description": "A simple javascript raycaster",
     "authors": "Daniel Hall",
     "version": "1.0.0",
+    "type": "module",
     "main": "src/index.js",
     "dependencies": {},
     "devDependencies": {
         "jest": "^26.5.3"
+    },
+    "scripts": {
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+        "test-coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
     }
 }
