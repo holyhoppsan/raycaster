@@ -52,16 +52,16 @@ class Vector2D {
         return newVector;
     }
 
+    mulEqual(value) {
+        this.x *= value.x;
+        this.y *= value.y;
+    }
+
     mulScalar(scalar) {
         const newVector = new Vector2D(this.x, this.y);
         newVector.x *= scalar;
         newVector.y *= scalar;
         return newVector;
-    }
-
-    mulEqual(value) {
-        this.x *= value.x;
-        this.y *= value.y;
     }
 
     mulScalarEqual(scalar) {
