@@ -14,6 +14,16 @@ class RenderBuffer {
         this.stride = 4;
 
         this.imagedata = this.context.createImageData(canvas.width, canvas.height);
+
+        this._pixelCount = 0;
+    }
+
+    resetPixelCount() {
+        this._pixelCount = 0;
+    }
+
+    get pixelCount() {
+        return this._pixelCount;
     }
 
     plotPixel(x, y, color) {
@@ -26,6 +36,8 @@ class RenderBuffer {
             this.imagedata.data[pixelIndex + 1] = color.g;
             this.imagedata.data[pixelIndex + 2] = color.b;
             this.imagedata.data[pixelIndex + 3] = color.a;
+
+            this._pixelCount++;
         }
     }
 
@@ -36,7 +48,6 @@ class RenderBuffer {
             }
         }
     }
-
 
     applyImageData = () => {
         this.context.putImageData(this.imagedata, 0, 0);
@@ -81,6 +92,10 @@ function drawLineDDA(startPos, endPos, color, renderBuffer) {
 }
 
 function drawLineDDATextured(startPos, endPos, startTexCoord, endTexCoord, texture, renderBuffer) {
+    if (startPos.y < 0 || endPos.y > renderBuffer.height) {
+        console.log(`startPos x: ${startPos.x}, y: ${startPos.y} endPos x: ${endPos.x}, y: ${endPos.y}`);
+    }
+
     const dx = endPos.x - startPos.x;
     const dy = endPos.y - startPos.y;
 

@@ -67,6 +67,8 @@ class Application {
     }
 
     update = (timeStamp) => {
+        this.renderBuffer.resetPixelCount();
+
         const targetFrameRate = document.getElementById("framelimiter").value;
         this.fpsInterval = this.oneSecInMS / targetFrameRate;
         const frameRateIsUnbound = targetFrameRate == 0;
@@ -97,6 +99,7 @@ class Application {
 
             document.getElementById("result").textContent = `Current fps = ${currentFPS}, current frame time = ${this.timeSinceLastTick} ms`;
 
+            document.getElementById('pixelCount').textContent = `PixelCount: ${this.renderBuffer.pixelCount}`;
             this.timeSinceLastTick = 0;
         }
 
